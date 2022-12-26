@@ -1,0 +1,138 @@
+These commands are to be runned in WINDOWS POWERSHELL
+
+View all databases - show dbs;
+Create or switch new database  - use dataB1 (dataB1 is name of new database)
+View current database - db
+Delete Database- db.dropDatabase()
+To view all collections - show collections
+To create a collection named secondCollection -  db.createCollection('secondCollection')
+To delete a collection- db.secondCollection.drop()
+
+***********************************************************************************************************
+***********************************************************************************************************
+
+MONGODB Commands for ROWS
+View all Rows in a collection- db.secondCollection.find()
+ or db.secondCollection.find().pretty()
+Insert 1 row - 
+db.secondCollection.insert({
+    'name': 'Rahul',
+    'lang' : 'Javascript',
+    'age' : 23
+})
+
+Insert Many Rows - 
+db.secondCollection.insertMany([{
+    'name': 'Rahul',
+    'lang' : 'Javascript',
+    'age' : 23
+},
+{
+    'name': 'Anand',
+    'lang' : 'Css',     
+    'age' : 25
+},
+{
+    'name': 'Sunny',
+    'lang' : 'HTML',
+    'age' : 24
+}])
+
+View all Rows - db.secondCollection.find()
+
+**********************************************************************************************************
+**********************************************************************************************************
+
+Search In a MongoDB database- 
+db.secondCollection.find({age:24})
+To find first row matching the object-
+db.secondCollection.findOne({name:'Rahul'})
+Search with row limit in output -
+db.secondCollection.find().pretty().limit(2)
+count the no. of rows in output-
+db.secondCollection.find({name: 'Rahul'}).count()
+To sort the output-
+db.secondCollection.find().sort({age: 1}).pretty()   --(1 for ascending and  -1 for descending)
+To find first row matching the object-
+
+**********************************************************************************************************
+**********************************************************************************************************
+
+To update a row - 
+db.secondCollection.update({name: 'Rahul'},
+{
+   'name': 'Rahul Anand',
+    'lang' : 'Javascript',
+    'age' : 24 
+})
+
+To update a row even if there is no matching data - 
+db.secondCollection.update({name: 'Ramesh'},
+{
+   'name': 'Rahul Anand',
+    'lang' : 'Javascript',
+    'age' : 24 
+},{upsert: true})
+
+Increment operator-
+db.secondCollection.update({name: 'Rahul'},
+{$inc:{
+    age : 2
+}})
+
+MongoDB Rename operator
+db.secondCollection.update({name: 'Rahul'},
+{$rename:{
+    lang : 'language'
+}})
+
+Delete Row-
+db.secondCollection.remove({name : 'Rahul'})
+
+Less than-
+db.secondCollection.find({age : {$lt: 90}})
+Less than equal to-
+db.secondCollection.find({age : {$lte: 90}})
+
+Greater than -
+db.secondCollection.find({age : {$gt: 90}})
+Greater than equal to-
+db.secondCollection.find({age : {$gte: 90}})
+
+**************************************************************************************************
+**************************************************************************************************
+//AGGREGATION//
+Sample inserted data-
+ db.employee.insertMany([
+    {eid:111,ename:"Akaash",loc:"BNG",salary:25000},
+    {eid:222,ename:"Alok",loc:"CHD",salary:52000},
+    {eid:333,ename:"Amar",loc:"BNG",salary:20000},
+    {eid:444,ename:"Akbar",loc:"MYS",salary:60000},
+    {eid:555,ename:"Anthony",loc:"CHD",salary:35000}
+    ])
+
+Aggregation pipeline operators-
+//to show the total salary grouped by location
+db.employee.aggregate([
+    {$project:{_id:0,loc:1,salary:1}},               //(project is used to select the desired categories)
+    {$group:{_id:"$loc",total:{$sum:"$salary"}}}     //(group is used to aggregate a set of data)
+    ])
+
+//To display the count of employee having same location having count greater than 1
+db.employee.aggregate([
+    {$project:{_id:0,loc:1}},
+    {$group:{_id:"$loc",count:{$sum:1}}},
+    {$match:{count:{$gt:1}}}
+])
+
+//to show first five highest salary in a new collection named highestSalary
+db.employee.aggregate([
+    {$sort:{salary: -1}},
+    {$limit:5},
+    {$out:"highestSalary"}
+])
+
+//to concatinate employee name and location
+db.employee.aggregate([
+    {$project:{emploc:{$concat:["$ename","-","$loc"]}}}
+])
